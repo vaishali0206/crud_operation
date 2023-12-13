@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Table } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-
+import axios from "axios";
 function Home() {
   const [data, setData] = useState([]);
 
@@ -16,7 +16,7 @@ function Home() {
     try {
       const response = await fetch("http://localhost:8000/getAll");
       const result = await response.json();
-      console.log(result);
+      //console.log(result);
       setData(result);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -24,14 +24,15 @@ function Home() {
   };
 
   // Function to delete an entry
-  const deleteEntry = async (id) => {
+  const deleteEmployee = async (id) => {
+    console.log(id);
     try {
-      await fetch(`https://your-api-endpoint.com/data/${id}`, {
-        method: "DELETE",
-      });
-
+     await axios.delete(`http://localhost:8000/delete/${id}`)
+      .then(() => {
+        setData(data.filter((item) => item._id !== id));
+       })
       // Update the local state after deletion
-      setData(data.filter((item) => item.id !== id));
+      
     } catch (error) {
       console.error("Error deleting entry:", error);
     }
@@ -61,7 +62,7 @@ function Home() {
                   <Button
                     onClick={() => {
                       // setID logic here if needed
-                      console.log("Update clicked for:", item.id);
+                      console.log("Update clicked for:", item._id);
                     }}
                     variant="info"
                   >
@@ -69,7 +70,7 @@ function Home() {
                   </Button>
                 </Link>
                 <Button
-                  onClick={() => deleteEntry(item.id)}
+                  onClick={() => deleteEmployee(item._id)}
                   variant="danger"
                 >
                   Delete

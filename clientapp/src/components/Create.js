@@ -1,39 +1,38 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import array from "./array";
-import { v4 as uuid } from "uuid";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
  
 function Create() {
     // Making usestate for setting and
     // fetching a value in jsx
-    const [name, setname] = useState("");
-    const [age, setage] = useState("");
+    const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [salary, setSalary] = useState("");
+  const [department, setDepartment] = useState("");
+  const [newEmployee, setNewEmployee] = useState({ name: '', email: '' ,salary:'',department:""});
  
     // Using useNavigation for redirecting to pages
-    let history = useNavigate();
+    let navigate = useNavigate(); 
  
     // Function for creating a post/entry
-    const handelSubmit = (e) => {
-        e.preventDefault(); // Prevent reload
- 
-        const ids = uuid(); // Creating unique id
-        let uni = ids.slice(0, 8); // Slicing unique id
- 
-        // Fetching a value from usestate and
-        // pushing to javascript object
-        let a = name,
-            b = age;
-        if (name == "" || age == "") {
-            alert("invalid input");
-            return;
-        }
-        array.push({ id: uni, Name: a, Age: b });
+    
+    const addEmployee = (e) => {
+       // e.preventDefault(); // Prevent default form submission behavior
+
+            axios.post('http://localhost:8000/add', newEmployee)
+              .then(response => {
+               // setEmployees([...employees, response.data]);
+               // setNewEmployee({ name: '', email: '' ,salary:'',department:""});
+               navigate('Home');
+              })
+              .catch(error => console.error('Error adding employee: ', error));
+          };
  
         // Redirecting to home page after creation done
-        history("/");
-    };
+        
+    
  
     return (
         <div>
@@ -48,9 +47,7 @@ function Create() {
                     controlId="formBasicName"
                 >
                     <Form.Control
-                        onChange={(e) =>
-                            setname(e.target.value)
-                        }
+                        onChange={e => setNewEmployee({ ...newEmployee, name: e.target.value })}
                         type="text"
                         placeholder="Enter Name"
                         required
@@ -59,24 +56,32 @@ function Create() {
  
                 {/* Fetching a value from input textfirld in
                     a setage using usestate*/}
-                <Form.Group
-                    className="mb-3"
-                    controlId="formBasicAge"
-                >
+               
+                <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Control
-                        onChange={(e) =>
-                            setage(e.target.value)
-                        }
-                        type="number"
-                        placeholder="Age"
-                        required
+                        onChange={e => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                        type="email"
+                        placeholder="Email"
                     />
+                    </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Control
+                    onChange={e => setNewEmployee({ ...newEmployee, salary: e.target.value })}
+                type="number"
+                    placeholder="Salary"
+                />
                 </Form.Group>
- 
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Control
+            onChange={e => setNewEmployee({ ...newEmployee, department: e.target.value })}
+            type="text"
+            placeholder="Department"
+          />
+        </Form.Group>
                 {/* handing a onclick event in button for
                     firing a function */}
                 <Button
-                    onClick={(e) => handelSubmit(e)}
+                    onClick={addEmployee}
                     variant="primary"
                     type="submit"
                 >
